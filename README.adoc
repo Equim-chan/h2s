@@ -61,4 +61,4 @@ $ h2s [-config h2s.json]
 ----
 
 == License
-https://github.com/Equim-chan/eae/blob/master/LICENSE[Apache-2.0]
+https://github.com/Equim-chan/h2s/blob/master/LICENSE[Apache-2.0]
