@@ -2,13 +2,13 @@ sudo: false
 
 language: go
 go:
-  - 1.10
+  - "1.10"
   - tip
 
 go_import_path: ekyu.moe/h2s
 
 install:
-  - go get ./...
+  - go get -t ./...
   - go generate ./...
 
 script:
