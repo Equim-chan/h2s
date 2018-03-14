@@ -26,12 +26,10 @@ build:
   ignore:
     - goos: openbsd
       goarch: arm
-      goarm: 6
     - goos: freebsd
       goarch: arm
-      goarm: 6
-    - goos: linux
-      goarch: arm64
+    - goos: solaris
+      goarch: arm
 
 archive:
   name_template: "{{ .ProjectName }}-{{.Os}}-{{.Arch}}"
