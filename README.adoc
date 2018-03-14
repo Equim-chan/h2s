@@ -1,6 +1,7 @@
 = h2s
 Equim <https://github.com/Equim-chan[@Equim-chan]>
 
+image:http://img.shields.io/badge/godoc-reference-5272B4.svg[GoDoc, link=https://godoc.org/ekyu.moe/base256]
 image:https://img.shields.io/github/release/Equim-chan/h2s.svg[Release, link=https://github.com/Equim-chan/h2s/releases/latest]
 image:https://img.shields.io/github/license/Equim-chan/h2s.svg[License, link=https://github.com/Equim-chan/h2s/blob/master/LICENSE]
 
@@ -48,7 +49,7 @@ An example config file:
   // timeout optionally sets timeout value when dialing to a upstream
   // default "20s"
   "timeout": "20s",
-  // retries specifies the max retries count of dialing to upstreams
+  // retries optionally specifies the max retries count of dialing to upstreams
   // default 3.
   "retries": 3
 }
