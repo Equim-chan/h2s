@@ -1,0 +1,64 @@
+= h2s
+Equim <https://github.com/Equim-chan[@Equim-chan]>
+
+image:https://img.shields.io/github/release/Equim-chan/h2s.svg[Release, link=https://github.com/Equim-chan/h2s/releases/latest]
+image:https://img.shields.io/github/license/Equim-chan/h2s.svg[License, link=https://github.com/Equim-chan/h2s/blob/master/LICENSE]
+
+h2s is a tiny CLI tool that wraps one or multiple HTTP proxies into a SOCKS5 proxy.
+
+== Install
+You can view the https://github.com/Equim-chan/h2s/releases[release] page for handy prebuilt binaries.
+
+== Build
+h2s relies on stadard libs only.
+
+[source,bash]
+----
+$ go get -u ekyu.moe/h2s/cmd/h2s
+----
+
+== Configure
+An example config file:
+
+[source,js]
+----
+{
+  // bind is the address h2s will listen to
+  "bind": "127.0.0.1:1080",
+
+  // upstreams are HTTP proxy upstreams.
+  "upstreams": [{
+    // if no port is specified, 80 is assumed by default
+    "address": "proxy1.example.com",
+  }, {
+    "address": "proxy2.example.com:3128",
+
+    // username and password are optional for HTTP authentication
+    "username": "Alice",
+    "password": "secret here"
+  }],
+
+  // accounts is an optional array of accounts for SOCKS5 authentication
+  // with no accounts, authentication is disabled
+  "accounts": [{
+    "username": "test server",
+    "password": "test"
+  }],
+
+  // timeout optionally sets timeout value when dialing to a upstream
+  // default "20s"
+  "timeout": "20s",
+  // retries specifies the max retries count of dialing to upstreams
+  // default 3.
+  "retries": 3
+}
+----
+
+== Usage
+[source,bash]
+----
+$ h2s [-config h2s.json]
+----
+
+== License
+https://github.com/Equim-chan/eae/blob/master/LICENSE[Apache-2.0]
