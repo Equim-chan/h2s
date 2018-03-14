@@ -123,11 +123,16 @@ func (s *Server) auth(conn io.ReadWriter) (err error) {
 		return fmt.Errorf("unexpected SOCKS authentication VER 0x%02x", buf[0])
 	}
 
+	// UNAME + PLEN
 	usernameLen := int(buf[1])
+	_, err = io.ReadFull(conn, buf[2:2+usernameLen+1])
+	if err != nil {
+		return
+	}
 	passwordLen := int(buf[2+usernameLen])
 
-	// UNAME + PLEN + PASSWD
-	_, err = io.ReadFull(conn, buf[2:2+usernameLen+1+passwordLen])
+	// PASSWD
+	_, err = io.ReadFull(conn, buf[2+usernameLen+1:2+usernameLen+1+passwordLen])
 	if err != nil {
 		return
 	}
