@@ -1,4 +1,4 @@
-package h2s
+package h2s // import "ekyu.moe/h2s"
 
 import (
 	"encoding/base64"

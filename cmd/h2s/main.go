@@ -1,4 +1,4 @@
-package main
+package main // import "ekyu.moe/h2s/cmd/h2s"
 
 import (
 	"encoding/json"
