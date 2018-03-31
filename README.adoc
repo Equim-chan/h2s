@@ -5,7 +5,9 @@ image:http://img.shields.io/badge/godoc-reference-5272B4.svg[GoDoc, link=https:/
 image:https://img.shields.io/github/release/Equim-chan/h2s.svg[Release, link=https://github.com/Equim-chan/h2s/releases/latest]
 image:https://img.shields.io/github/license/Equim-chan/h2s.svg[License, link=https://github.com/Equim-chan/h2s/blob/master/LICENSE]
 
-h2s is a tiny CLI tool that wraps one or multiple HTTP or HTTPS proxies into a SOCKS5 proxy. It does something like https://www.irif.fr/~jch/software/polipo/[polipo], http://www.privoxy.org/[privoxy] do, _in a reversed way_.
+h2s is a tiny CLI tool that wraps one or multiple HTTP or HTTPS proxies into a SOCKS5 proxy. It does something like https://www.irif.fr/~jch/software/polipo/[polipo] and http://www.privoxy.org/[privoxy] do, but in a reversed way.
+
+There are already some SOCKS to HTTP tools out there, but I can hardly find a reversed one (HTTP to SOCKS), so I decided to make one on my own.
 
 == Install
 You can view the https://github.com/Equim-chan/h2s/releases[release] page for handy prebuilt binaries.
