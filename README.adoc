@@ -14,7 +14,7 @@ There are already some SOCKS to HTTP tools out there, but I can hardly find a re
 == Install
 You can view the https://github.com/Equim-chan/h2s/releases[release] page for handy prebuilt binaries.
 
-== Build
+== Build from Source
 h2s relies on stadard libs only.
 
 [source,bash]
@@ -29,6 +29,8 @@ An example config file:
 ----
 {
   // bind is the address h2s will listen to.
+  // Note that since HTTP/HTTPS proxy support only TCP, the h2s wrapped SOCKS5
+  // proxy consequently support only TCP as well.
   "bind": "127.0.0.1:1080",
 
   // upstreams are HTTP proxy upstreams.
