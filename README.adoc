@@ -1,8 +1,10 @@
 = h2s
 Equim <https://github.com/Equim-chan[@Equim-chan]>
 
-image:http://img.shields.io/badge/godoc-reference-5272B4.svg[GoDoc, link=https://godoc.org/ekyu.moe/base256]
+image:https://img.shields.io/travis/Equim-chan/h2s.svg[Travis, link=https://travis-ci.org/Equim-chan/h2s]
+image:http://img.shields.io/badge/godoc-reference-5272B4.svg[GoDoc, link=https://godoc.org/ekyu.moe/h2s]
 image:https://img.shields.io/github/release/Equim-chan/h2s.svg[Release, link=https://github.com/Equim-chan/h2s/releases/latest]
+image:https://goreportcard.com/badge/github.com/Equim-chan/h2s[Go Report Card, link=https://goreportcard.com/report/github.com/Equim-chan/h2s]
 image:https://img.shields.io/github/license/Equim-chan/h2s.svg[License, link=https://github.com/Equim-chan/h2s/blob/master/LICENSE]
 
 h2s is a tiny CLI tool that wraps one or multiple HTTP or HTTPS proxies into a SOCKS5 proxy. It does something like https://www.irif.fr/~jch/software/polipo/[polipo] and http://www.privoxy.org/[privoxy] do, but in a reversed way.
