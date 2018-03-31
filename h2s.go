@@ -175,7 +175,7 @@ func NewServer(c *Config) (*Server, error) {
 				if !certPool.AppendCertsFromPEM(pem) {
 					return nil, errors.New("h2s: create server: tls: failed to load rootCAs")
 				}
-				tlsConfig.RootCA = certPool
+				tlsConfig.RootCAs = certPool
 			}
 
 			if t.CertFile != "" && t.KeyFile != "" {
