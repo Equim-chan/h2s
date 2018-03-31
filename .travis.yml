@@ -25,7 +25,7 @@ deploy:
     script: curl -SsL https://git.io/goreleaser | bash
     on:
       tags: true
-      condition: $TRAVIS_GO_VERSION = 1.10.1
+      condition: $TRAVIS_GO_VERSION =~ ^1\.10\.[0-9]+$
 
 notifications:
   email:
