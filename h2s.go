@@ -1,11 +1,15 @@
 package h2s // import "ekyu.moe/h2s"
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"net"
 	"net/http"
+	"net/url"
 	"sync"
 	"time"
 )
@@ -16,6 +20,27 @@ type Upstream struct {
 	Address  string `json:"address"`
 	Username string `json:"username,omitempty"`
 	Password string `json:"password,omitempty"`
+
+	// TLSConfig can be null.
+	TLSConfig *TLSConfig `json:"tlsConfig"`
+}
+
+// TLSConfig is a simplified version of tls.Config
+type TLSConfig struct {
+	// If empty, ServerName is set to the hostname from Address.
+	// This is useful in some cases, for example a server behind Cloudflare,
+	// since Cloudflare would simply reject CONNECT method.
+	ServerName string `json:"serverName"`
+
+	// Do not set to true unless you know what you are doing.
+	InsecureSkipVerify bool `json:"insecureSkipVerify"`
+
+	// For self-signed certs. Be careful.
+	RootCA string `json:"rootCA"`
+
+	// For client auth.
+	CertFile string `json:"certFile"`
+	KeyFile  string `json:"keyFile"`
 }
 
 // Account is used for SOCKS5 authentication.
@@ -40,8 +65,9 @@ type Config struct {
 }
 
 type internalUpstream struct {
-	address string
-	header  http.Header
+	address   string
+	header    http.Header
+	tlsConfig *tls.Config
 }
 
 type internalAccount struct {
@@ -124,15 +150,54 @@ func NewServer(c *Config) (*Server, error) {
 		}
 		addr = net.JoinHostPort(host, port)
 
+		tlsConfig := (*tls.Config)(nil)
+		if t := v.TLSConfig; t != nil {
+			tlsConfig = new(tls.Config)
+
+			if t.ServerName != "" {
+				tlsConfig.ServerName = t.ServerName
+			} else {
+				u, err := url.Parse(v.Address)
+				if err != nil {
+					return nil, errors.New("h2s: create server: tls: parse server name: " + err.Error())
+				}
+				tlsConfig.ServerName = u.Hostname()
+			}
+
+			tlsConfig.InsecureSkipVerify = t.InsecureSkipVerify
+
+			if t.RootCA != "" {
+				certPool := x509.NewCertPool()
+				pem, err := ioutil.ReadFile(t.RootCA)
+				if err != nil {
+					return nil, errors.New("h2s: create server: tls: read rootCAs: " + err.Error())
+				}
+				if !certPool.AppendCertsFromPEM(pem) {
+					return nil, errors.New("h2s: create server: tls: failed to load rootCAs")
+				}
+				tlsConfig.RootCA = certPool
+			}
+
+			if t.CertFile != "" && t.KeyFile != "" {
+				cert, err := tls.LoadX509KeyPair(t.CertFile, t.KeyFile)
+				if err != nil {
+					return nil, errors.New("h2s: create server: tls: load key pair: " + err.Error())
+				}
+				tlsConfig.Certificates = []tls.Certificate{cert}
+			}
+		}
+
 		upstreams[i] = &internalUpstream{
-			address: addr,
-			header:  basicauth(v.Username, v.Password),
+			address:   addr,
+			header:    basicauth(v.Username, v.Password),
+			tlsConfig: tlsConfig,
 		}
 	}
 
 	s.next = make(chan *internalUpstream)
 	s.stop = make(chan struct{})
 	go func() {
+		// simple round-robin
 		for {
 			for _, v := range upstreams {
 				select {

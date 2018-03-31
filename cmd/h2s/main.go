@@ -24,7 +24,7 @@ type config struct {
 func main() {
 	n, conf := configure()
 	if n != 0 {
-		os.Exit(0)
+		os.Exit(n)
 	}
 
 	s, err := h2s.NewServer(conf.Config)

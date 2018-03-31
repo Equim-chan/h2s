@@ -2,6 +2,7 @@ package h2s
 
 import (
 	"bufio"
+	"crypto/tls"
 	"errors"
 	"net"
 	"net/http"
@@ -17,13 +18,17 @@ func (s *Server) dialUpstream() (conn net.Conn, u *internalUpstream, err error) 
 			return
 		}
 
-		conn, err = s.dialer.Dial("tcp", u.address)
+		if u.tlsConfig != nil {
+			conn, err = tls.DialWithDialer(s.dialer, "tcp", u.address, u.tlsConfig)
+		} else {
+			conn, err = s.dialer.Dial("tcp", u.address)
+		}
 		if err == nil {
 			return
 		}
 	}
-
 	err = errors.New("max retry exceeded: " + err.Error())
+
 	return
 }
 
