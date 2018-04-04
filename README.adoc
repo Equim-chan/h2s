@@ -50,6 +50,10 @@ An example config file:
     "address": "secure.proxy.example.com:443",
     "username": "Secure",
     "password": "Yeah!",
+
+    // h2s only provides some basic TLS settings. If you are an advanced user and
+    // looking for other settings, you may use stunnel(1) to handle TLS instead,
+    // and simply leave a naive TCP interface to h2s.
     "tls": {
       // If empty, serverName is set to the hostname from address.
       // Most users could just leave it empty.
@@ -92,4 +96,4 @@ $ h2s [-config h2s.json]
 ----
 
 == License
-https://github.com/Equim-chan/h2s/blob/master/LICENSE[Apache-2.0]
+https://github.com/Equim-chan/h2s/blob/master/LICENSE[MIT]
