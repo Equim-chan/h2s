@@ -1,3 +1,6 @@
+// Package h2s provides a tool that wraps one or multiple HTTP or HTTPS proxies
+// into a SOCKS5 proxy. It does something like polipo and privoxy do,
+// but in a reversed way.
 package h2s // import "ekyu.moe/h2s"
 
 import (

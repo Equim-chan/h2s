@@ -36,12 +36,13 @@ const (
 	socksNoMethod     byte = 0xff
 )
 
-// RFC 1928
-// +----+----------+----------+
-// |VER | NMETHODS | METHODS  |
-// +----+----------+----------+
-// | 1  |    1     | 1 to 255 |
-// +----+----------+----------+
+// As per RFC 1928
+//
+//     +----+----------+----------+
+//     |VER | NMETHODS | METHODS  |
+//     +----+----------+----------+
+//     | 1  |    1     | 1 to 255 |
+//     +----+----------+----------+
 func (s *Server) handshake(conn io.ReadWriter) (err error) {
 	buf := handshakeBufPool.Get().([]byte)
 	defer handshakeBufPool.Put(buf)
@@ -103,12 +104,13 @@ const (
 	socksAuthFail    byte = 0x01
 )
 
-// RFC 1929
-// +----+------+----------+------+----------+
-// |VER | ULEN |  UNAME   | PLEN |  PASSWD  |
-// +----+------+----------+------+----------+
-// | 1  |  1   | 1 to 255 |  1   | 1 to 255 |
-// +----+------+----------+------+----------+
+// As per RFC 1929
+//
+//     +----+------+----------+------+----------+
+//     |VER | ULEN |  UNAME   | PLEN |  PASSWD  |
+//     +----+------+----------+------+----------+
+//     | 1  |  1   | 1 to 255 |  1   | 1 to 255 |
+//     +----+------+----------+------+----------+
 func (s *Server) auth(conn io.ReadWriter) (err error) {
 	buf := authBufPool.Get().([]byte)
 	defer authBufPool.Put(buf)
@@ -168,12 +170,13 @@ const (
 	socksAddrIpv6       byte = 0x04
 )
 
-// RFC 1928
-// +----+-----+-------+------+----------+----------+
-// |VER | CMD |  RSV  | ATYP | DST.ADDR | DST.PORT |
-// +----+-----+-------+------+----------+----------+
-// | 1  |  1  | X'00' |  1   | Variable |    2     |
-// +----+-----+-------+------+----------+----------+
+// As per RFC 1928
+//
+//     +----+-----+-------+------+----------+----------+
+//     |VER | CMD |  RSV  | ATYP | DST.ADDR | DST.PORT |
+//     +----+-----+-------+------+----------+----------+
+//     | 1  |  1  | X'00' |  1   | Variable |    2     |
+//     +----+-----+-------+------+----------+----------+
 func (s *Server) readRequest(conn io.ReadWriter) (target string, err error) {
 	buf := reqBufPool.Get().([]byte)
 	defer reqBufPool.Put(buf)
