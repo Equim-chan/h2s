@@ -237,10 +237,11 @@ func (s *Server) Serve(conn net.Conn) error {
 
 	// this is bad
 	s.mu.Lock()
-	if s.isClosed {
+	isClosed := s.isClosed
+	s.mu.Unlock()
+	if isClosed {
 		return errors.New("h2s: server is closed")
 	}
-	s.mu.Unlock()
 
 	if err := s.handshake(conn); err != nil {
 		return errors.New("h2s: handshake: " + err.Error())
