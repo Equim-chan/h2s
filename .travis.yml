@@ -2,7 +2,7 @@ sudo: false
 
 language: go
 go:
-  - "1.10.2"
+  - "1.11"
   - tip
 
 go_import_path: ekyu.moe/h2s
@@ -14,10 +14,6 @@ install:
 script:
   - diff -u <(echo -n) <(gofmt -d .)
   - go vet ./...
-  # - go test -v -race -coverprofile=coverage.txt -covermode=atomic
-
-after_success:
-  # - bash <(curl -s https://codecov.io/bash)
 
 deploy:
   - provider: script
@@ -25,7 +21,7 @@ deploy:
     script: curl -SsL https://git.io/goreleaser | bash
     on:
       tags: true
-      condition: $TRAVIS_GO_VERSION = 1.10.2
+      condition: $TRAVIS_GO_VERSION = 1.11
 
 notifications:
   email:
