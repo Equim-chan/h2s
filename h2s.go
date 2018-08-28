@@ -7,6 +7,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/base64"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -35,8 +36,14 @@ type TLSConfig struct {
 	// since Cloudflare would simply reject CONNECT method.
 	ServerName string `json:"serverName"`
 
+	// If you prefer to set a fingerprint instead of providing certs, you can
+	// set this to true.
+	//
 	// Do not set to true unless you know what you are doing.
 	InsecureSkipVerify bool `json:"insecureSkipVerify"`
+	// Server's SHA256 fingerprint, used to verify as an alternative to providing
+	// the whole server certs.
+	SHA256Fingerprint string `json:"sha256Fingerprint"`
 
 	// For self-signed certs. Be careful.
 	RootCA string `json:"rootCA"`
@@ -68,9 +75,10 @@ type Config struct {
 }
 
 type internalUpstream struct {
-	address   string
-	header    http.Header
-	tlsConfig *tls.Config
+	address        string
+	header         http.Header
+	tlsConfig      *tls.Config
+	tlsFingerprint []byte
 }
 
 type internalAccount struct {
@@ -153,6 +161,11 @@ func NewServer(c *Config) (*Server, error) {
 		}
 		addr = net.JoinHostPort(host, port)
 
+		upstream := &internalUpstream{
+			address: addr,
+			header:  basicauth(v.Username, v.Password),
+		}
+
 		tlsConfig := (*tls.Config)(nil)
 		if t := v.TLSConfig; t != nil {
 			tlsConfig = new(tls.Config)
@@ -168,6 +181,17 @@ func NewServer(c *Config) (*Server, error) {
 			}
 
 			tlsConfig.InsecureSkipVerify = t.InsecureSkipVerify
+			if t.SHA256Fingerprint != "" {
+				fin, err := hex.DecodeString(t.SHA256Fingerprint)
+				if err != nil {
+					return nil, errors.New("h2s: create server: tls: failed to parse fingerprint")
+				}
+				if len(fin) != 32 {
+					return nil, errors.New("h2s: create server: tls: fingerprint: wrong length, not like a sha256 digest")
+				}
+
+				upstream.tlsFingerprint = fin
+			}
 
 			if t.RootCA != "" {
 				certPool := x509.NewCertPool()
@@ -189,12 +213,9 @@ func NewServer(c *Config) (*Server, error) {
 				tlsConfig.Certificates = []tls.Certificate{cert}
 			}
 		}
+		upstream.tlsConfig = tlsConfig
 
-		upstreams[i] = &internalUpstream{
-			address:   addr,
-			header:    basicauth(v.Username, v.Password),
-			tlsConfig: tlsConfig,
-		}
+		upstreams[i] = upstream
 	}
 
 	s.next = make(chan *internalUpstream)

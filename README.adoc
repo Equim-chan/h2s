@@ -59,8 +59,21 @@ An example config file:
       // Most users could just leave it empty.
       "serverName": "secure.proxy.example.com",
 
+      // If you prefer to set a fingerprint instead of providing certs, you can
+      // set this to true.
       // Do not set to true unless you know what you are doing.
       "insecureSkipVerify": false,
+      // Server's SHA256 fingerprint, used to verify as an alternative to providing
+      // the whole server certs, should be used with insecureSkipVerify to true.
+      // If both rootCA and sha256Fingerprint are provided, they will both be
+      // verified.
+      //
+      // An example to get fingerprint of a given cert:
+      //     openssl x509 -fingerprint -sha256 -noout -in cert.cer | cut -f2 -d'=' | sed s/://g
+      // or of a server with TLS enabled:
+      //      openssl s_client -showcerts -connect example.com:443 < /dev/null | \
+      //        openssl x509 -fingerprint -sha256 -noout | cut -f2 -d'=' | sed s/://g
+      "sha256fingerprint": "22B975A1409850EF7F4522183E9C5A8955758FC899D70FE257112DA2FC430CCC",
 
       // rootCA is useful for self-signed certs. Be careful with it.
       // If the server has a trusted cert, you don't have to set it.
