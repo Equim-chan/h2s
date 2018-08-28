@@ -1,0 +1,32 @@
+version: 2
+jobs:
+  lint:
+    docker:
+      - image: circleci/golang:1.11
+    steps:
+      - checkout
+      - run:
+          name: gofmt
+          command: diff -u <(echo -n) <(gofmt -d .)
+      - run:
+          name: govet
+          command: go vet ./...
+  release:
+    docker:
+      - image: circleci/golang:1.11
+    steps:
+      - checkout
+      - run:
+          name: release
+          command: curl -sL https://git.io/goreleaser | bash
+workflows:
+  version: 2
+  release:
+    jobs:
+      - lint
+      - release:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*(-.*)*/
