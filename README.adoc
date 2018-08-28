@@ -1,9 +1,9 @@
 = h2s
 Equim <https://github.com/Equim-chan[@Equim-chan]>
 
-image:https://img.shields.io/travis/Equim-chan/h2s.svg[Travis, link=https://travis-ci.org/Equim-chan/h2s]
 image:http://img.shields.io/badge/godoc-reference-5272B4.svg[GoDoc, link=https://godoc.org/ekyu.moe/h2s]
 image:https://img.shields.io/github/release/Equim-chan/h2s.svg[Release, link=https://github.com/Equim-chan/h2s/releases/latest]
+image:https://img.shields.io/circleci/project/github/Equim-chan/h2s.svg[CircleCI, link=https://circleci.com/gh/Equim-chan/h2s]
 image:https://goreportcard.com/badge/github.com/Equim-chan/h2s[Go Report Card, link=https://goreportcard.com/report/github.com/Equim-chan/h2s]
 image:https://img.shields.io/github/license/Equim-chan/h2s.svg[License, link=https://github.com/Equim-chan/h2s/blob/master/LICENSE]
 
