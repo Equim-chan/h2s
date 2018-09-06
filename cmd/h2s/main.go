@@ -29,14 +29,14 @@ func main() {
 
 	s, err := h2s.NewServer(conf.Config)
 	if err != nil {
-		stderr.Println(err)
+		stderr.Println("h2s: create server:", err)
 		os.Exit(2)
 	}
 	defer s.Close()
 
 	l, err := net.Listen("tcp", conf.Bind)
 	if err != nil {
-		stderr.Println("bind:", err)
+		stderr.Println("h2s: bind:", err)
 		os.Exit(2)
 	}
 	stdout.Println("Listening on", l.Addr())
@@ -44,13 +44,13 @@ func main() {
 	for {
 		conn, err := l.Accept()
 		if err != nil {
-			stderr.Println("accept:", err)
+			stderr.Println("h2s: accept:", err)
 			continue
 		}
 
 		go func() {
 			if err := s.Serve(conn); err != nil {
-				stderr.Println(err)
+				stderr.Println("h2s: serve:", err)
 			}
 		}()
 	}

@@ -11,7 +11,6 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -121,7 +120,7 @@ func NewServer(c *Config) (*Server, error) {
 	if c.Timeout != "" {
 		timeout, err := time.ParseDuration(c.Timeout)
 		if err != nil {
-			return nil, errors.New("h2s: create server: " + err.Error())
+			return nil, errors.New("parse timeout: " + err.Error())
 		}
 		s.dialer = &net.Dialer{Timeout: timeout}
 	} else {
@@ -146,7 +145,7 @@ func NewServer(c *Config) (*Server, error) {
 	}
 
 	if len(c.Upstreams) == 0 {
-		return nil, errors.New("h2s: create server: no upstreams")
+		return nil, errors.New("no upstreams")
 	}
 
 	upstreams := make([]*internalUpstream, len(c.Upstreams))
@@ -157,7 +156,7 @@ func NewServer(c *Config) (*Server, error) {
 			addr += ":80"
 			host, port, err = net.SplitHostPort(addr)
 			if err != nil {
-				return nil, fmt.Errorf("h2s: create server: invalid address %q", v.Address)
+				return nil, errors.New("invalid address " + v.Address)
 			}
 		}
 		addr = net.JoinHostPort(host, port)
@@ -171,7 +170,7 @@ func NewServer(c *Config) (*Server, error) {
 			} else {
 				u, err := url.Parse(v.Address)
 				if err != nil {
-					return nil, errors.New("h2s: create server: tls: parse server name: " + err.Error())
+					return nil, errors.New("tls: parse server name: " + err.Error())
 				}
 				tlsConfig.ServerName = u.Hostname()
 			}
@@ -180,10 +179,10 @@ func NewServer(c *Config) (*Server, error) {
 			if t.SHA256Fingerprint != "" {
 				fin, err := hex.DecodeString(t.SHA256Fingerprint)
 				if err != nil {
-					return nil, errors.New("h2s: create server: tls: failed to parse fingerprint")
+					return nil, errors.New("tls: failed to parse fingerprint")
 				}
 				if len(fin) != 32 {
-					return nil, errors.New("h2s: create server: tls: fingerprint: wrong length, not like a sha256 digest")
+					return nil, errors.New("tls: fingerprint: wrong length, not like a sha256 digest")
 				}
 
 				tlsConfig.VerifyPeerCertificate = func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
@@ -204,10 +203,10 @@ func NewServer(c *Config) (*Server, error) {
 				certPool := x509.NewCertPool()
 				pem, err := ioutil.ReadFile(t.RootCA)
 				if err != nil {
-					return nil, errors.New("h2s: create server: tls: read rootCAs: " + err.Error())
+					return nil, errors.New("tls: read rootCAs: " + err.Error())
 				}
 				if !certPool.AppendCertsFromPEM(pem) {
-					return nil, errors.New("h2s: create server: tls: failed to load rootCAs")
+					return nil, errors.New("tls: failed to load rootCAs")
 				}
 				tlsConfig.RootCAs = certPool
 			}
@@ -215,7 +214,7 @@ func NewServer(c *Config) (*Server, error) {
 			if t.CertFile != "" && t.KeyFile != "" {
 				cert, err := tls.LoadX509KeyPair(t.CertFile, t.KeyFile)
 				if err != nil {
-					return nil, errors.New("h2s: create server: tls: load key pair: " + err.Error())
+					return nil, errors.New("tls: load key pair: " + err.Error())
 				}
 				tlsConfig.Certificates = []tls.Certificate{cert}
 			}
@@ -251,7 +250,7 @@ func NewServer(c *Config) (*Server, error) {
 func (s *Server) Close() error {
 	s.mu.Lock()
 	if s.isClosed {
-		return errors.New("h2s: server is already closed")
+		return errors.New("server is already closed")
 	}
 	s.stop <- struct{}{}
 	s.isClosed = true
@@ -271,26 +270,26 @@ func (s *Server) Serve(conn net.Conn) error {
 	isClosed := s.isClosed
 	s.mu.Unlock()
 	if isClosed {
-		return errors.New("h2s: server is closed")
+		return errors.New("server is closed")
 	}
 
 	if err := s.handshake(conn); err != nil {
-		return errors.New("h2s: handshake: " + err.Error())
+		return errors.New("handshake: " + err.Error())
 	}
 
 	target, err := s.readRequest(conn)
 	if err != nil {
-		return errors.New("h2s: read request: " + err.Error())
+		return errors.New("read request: " + err.Error())
 	}
 
 	out, u, err := s.dialUpstream()
 	if err != nil {
-		return errors.New("h2s: dial upstream: " + err.Error())
+		return errors.New("dial upstream: " + err.Error())
 	}
 	defer out.Close()
 
 	if err := s.handshakeUpstream(out, u, target); err != nil {
-		return errors.New("h2s: handshake upstream: " + err.Error())
+		return errors.New("handshake upstream: " + err.Error())
 	}
 
 	// sync
