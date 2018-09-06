@@ -4,6 +4,8 @@
 package h2s // import "ekyu.moe/h2s"
 
 import (
+	"crypto/hmac"
+	"crypto/sha256"
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/base64"
@@ -75,10 +77,9 @@ type Config struct {
 }
 
 type internalUpstream struct {
-	address        string
-	header         http.Header
-	tlsConfig      *tls.Config
-	tlsFingerprint []byte
+	address   string
+	header    http.Header
+	tlsConfig *tls.Config
 }
 
 type internalAccount struct {
@@ -161,11 +162,6 @@ func NewServer(c *Config) (*Server, error) {
 		}
 		addr = net.JoinHostPort(host, port)
 
-		upstream := &internalUpstream{
-			address: addr,
-			header:  basicauth(v.Username, v.Password),
-		}
-
 		tlsConfig := (*tls.Config)(nil)
 		if t := v.TLSConfig; t != nil {
 			tlsConfig = new(tls.Config)
@@ -190,7 +186,18 @@ func NewServer(c *Config) (*Server, error) {
 					return nil, errors.New("h2s: create server: tls: fingerprint: wrong length, not like a sha256 digest")
 				}
 
-				upstream.tlsFingerprint = fin
+				tlsConfig.VerifyPeerCertificate = func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
+					if len(rawCerts) < 1 {
+						return errors.New("server provides no cert")
+					}
+
+					sum := sha256.Sum256(rawCerts[0])
+					if !hmac.Equal(sum[:], fin) {
+						return errors.New("wrong fingerprint")
+					}
+
+					return nil
+				}
 			}
 
 			if t.RootCA != "" {
@@ -213,9 +220,12 @@ func NewServer(c *Config) (*Server, error) {
 				tlsConfig.Certificates = []tls.Certificate{cert}
 			}
 		}
-		upstream.tlsConfig = tlsConfig
 
-		upstreams[i] = upstream
+		upstreams[i] = &internalUpstream{
+			address:   addr,
+			header:    basicauth(v.Username, v.Password),
+			tlsConfig: tlsConfig,
+		}
 	}
 
 	s.next = make(chan *internalUpstream)

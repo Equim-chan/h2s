@@ -2,8 +2,6 @@ package h2s
 
 import (
 	"bufio"
-	"crypto/hmac"
-	"crypto/sha256"
 	"crypto/tls"
 	"errors"
 	"net"
@@ -21,33 +19,14 @@ func (s *Server) dialUpstream() (conn net.Conn, u *internalUpstream, err error) 
 		}
 
 		if u.tlsConfig == nil {
+			conn, err = tls.DialWithDialer(s.dialer, "tcp", u.address, u.tlsConfig)
+		} else {
 			conn, err = s.dialer.Dial("tcp", u.address)
-			if err == nil {
-				return
-			}
 		}
 
-		tlsConn, terr := tls.DialWithDialer(s.dialer, "tcp", u.address, u.tlsConfig)
-		if terr != nil {
-			err = terr
-			continue
+		if err == nil {
+			return
 		}
-		if u.tlsFingerprint != nil {
-			certs := tlsConn.ConnectionState().PeerCertificates
-			if len(certs) < 1 {
-				err = errors.New("the server gives no cert")
-				continue
-			}
-
-			fin := sha256.Sum256(certs[0].Raw)
-			if !hmac.Equal(fin[:], u.tlsFingerprint) {
-				err = errors.New("fingerprint not matched")
-				continue
-			}
-		}
-
-		conn = tlsConn
-		return
 	}
 	err = errors.New("max retry exceeded: " + err.Error())
 
