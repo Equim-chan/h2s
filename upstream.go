@@ -18,7 +18,7 @@ func (s *Server) dialUpstream() (conn net.Conn, u *internalUpstream, err error) 
 			return
 		}
 
-		if u.tlsConfig == nil {
+		if u.tlsConfig != nil {
 			conn, err = tls.DialWithDialer(s.dialer, "tcp", u.address, u.tlsConfig)
 		} else {
 			conn, err = s.dialer.Dial("tcp", u.address)
