@@ -7,9 +7,9 @@ image:https://img.shields.io/circleci/project/github/Equim-chan/h2s.svg[CircleCI
 image:https://goreportcard.com/badge/github.com/Equim-chan/h2s[Go Report Card, link=https://goreportcard.com/report/github.com/Equim-chan/h2s]
 image:https://img.shields.io/github/license/Equim-chan/h2s.svg[License, link=https://github.com/Equim-chan/h2s/blob/master/LICENSE]
 
-h2s is a tiny CLI tool that wraps one or multiple HTTP or HTTPS proxies into a SOCKS5 proxy. It does something like https://www.irif.fr/~jch/software/polipo/[polipo] and http://www.privoxy.org/[privoxy] do, but in a reversed way.
+h2s is a tiny CLI tool that wraps one or multiple HTTPS proxies into a SOCKS5 proxy. It does something like https://www.irif.fr/~jch/software/polipo/[polipo] and http://www.privoxy.org/[privoxy] do, but in a reversed way.
 
-There are already some SOCKS to HTTP tools out there, but I can hardly find a reversed one (HTTP to SOCKS), so I decided to make one on my own.
+There are already some SOCKS to HTTPS tools out there, but I can hardly find a reversed one (HTTPS to SOCKS), so I decided to make one on my own.
 
 == Install
 You can view the https://github.com/Equim-chan/h2s/releases[release] page for handy prebuilt binaries.
@@ -29,11 +29,11 @@ An example config file:
 ----
 {
   // bind is the address h2s will listen to.
-  // Note that since HTTP/HTTPS proxy support only TCP, the h2s wrapped SOCKS5
+  // Note that since HTTPS proxy support only TCP, the h2s wrapped SOCKS5
   // proxy consequently support only TCP as well.
   "bind": "127.0.0.1:1080",
 
-  // upstreams are HTTP proxy upstreams.
+  // upstreams are HTTPS proxy upstreams.
   // h2s will do a simple round-robin load balance.
   "upstreams": [{
     // If no port is specified, 80 is assumed by default.
@@ -41,11 +41,11 @@ An example config file:
   }, {
     "address": "proxy2.example.com:3128",
 
-    // username and password are optional for HTTP authentication.
+    // username and password are optional for proxy authentication.
     "username": "Alice",
     "password": "secret here"
   }, {
-    // An HTTPS proxy (HTTP over TLS) upstream.
+    // An HTTPS proxy over TLS upstream.
     // You have to specify port explicitly (usually 443), and set the tls field.
     "address": "secure.proxy.example.com:443",
     "username": "Secure",
@@ -54,7 +54,7 @@ An example config file:
     // h2s only provides some basic TLS settings. If you are an advanced user and
     // looking for other settings, you may use stunnel(1) to handle TLS instead,
     // and simply leave a naive TCP interface to h2s.
-    "tls": {
+    "tlsConfig": {
       // If empty, serverName is set to the hostname from address.
       // Most users could just leave it empty.
       "serverName": "secure.proxy.example.com",

@@ -19,7 +19,7 @@ import (
 	"time"
 )
 
-// Upstream is a HTTP proxy upstream that must support CONNECT method as defined
+// Upstream is a HTTPS proxy upstream that must support CONNECT method as defined
 // in RFC 7231 section 4.3.6.
 type Upstream struct {
 	Address  string `json:"address"`
