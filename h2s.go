@@ -163,7 +163,9 @@ func NewServer(c *Config) (*Server, error) {
 
 		tlsConfig := (*tls.Config)(nil)
 		if t := v.TLSConfig; t != nil {
-			tlsConfig = new(tls.Config)
+			tlsConfig = &tls.Config{
+				NextProtos: []string{"http/1.1"},
+			}
 
 			if t.ServerName != "" {
 				tlsConfig.ServerName = t.ServerName
